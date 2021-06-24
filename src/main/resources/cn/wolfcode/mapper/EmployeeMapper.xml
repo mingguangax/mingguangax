@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.wolfcode.mapper.EmployeeMapper" >
+
+
+  <resultMap id="BaseResultMap" type="cn.wolfcode.domain.Employee" >
+    <id column="id" property="id" />
+    <result column="username" property="username" />
+    <result column="name" property="name" />
+    <result column="password" property="password" />
+    <result column="email" property="email" />
+    <result column="age" property="age" />
+    <result column="admin" property="admin" />
+    <result column="dept_id" property="dept_id" />
+  </resultMap>
+  <delete id="deleteById" >
+    delete from employee
+    where id = #{id}
+  </delete>
+    <delete id="deleteEmpRoleById">
+      delete from employee_role
+      where employee_id = #{id}
+    </delete>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" >
+    insert into employee (username, name, password, email, age, admin, dept_id
+      )
+    values (#{username}, #{name}, #{password}, #{email}, #{age}, #{admin}, #{dept_id}
+      )
+  </insert>
+  <insert id="insertEmplRole" useGeneratedKeys="true" keyProperty="id">
+    insert into employee_role (employee_id, role_id) values (#{id},#{aLong})
+  </insert>
+  <update id="update" >
+    update employee
+    set email = #{email},
+      age = #{age},
+      admin = #{admin},
+      dept_id = #{dept_id}
+    where id = #{id}
+  </update>
+    <update id="updateById">
+      update employee
+      set password=#{newPas}
+    where id = #{id}
+    </update>
+    <select id="selectById" resultMap="BaseResultMap" >
+    select id, username, name, password, email, age, admin, dept_id
+    from employee
+    where id = #{id}
+  </select>
+
+
+
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select id, username, name, password, email, age, admin, dept_id
+    from employee
+  </select>
+  <select id="selectByCount" resultType="java.lang.Integer">
+    select count(*)
+    from employee
+  </select>
+
+  <resultMap id="baseMap" type="cn.wolfcode.domain.Employee">
+    <id property="id" column="e_id"/>
+    <result property="username" column="e_username"/>
+    <result property="password" column="e_password"/>
+    <result property="name" column="e_name"/>
+    <result property="age" column="e_age"/>
+    <result property="email" column="e_email"/>
+    <result property="admin" column="e_admin"/>
+    <result property="department.name" column="d_name"/>
+    <result property="department.id" column="d_id"/>
+    <result property="department.sn" column="d_sn"/>
+  </resultMap>
+
+  <select id="selectByList" resultMap="BaseResultMap">
+    select e.id,e.username,e.password, e.name,e.age,e.email,e.admin,e.dept_id,d.id as d_id,d.name as d_name,d.sn as d_sn
+    from employee e left join department d on e.dept_id=d.id
+<!--    <include refid="sql_one"></include>-->
+    <where>
+      <if test="keyword != null and keyword !=''">
+        and (e.name like concat('%',#{keyword},'%') or e.email like concat('%',#{keyword},'%'))
+      </if>
+      <if test="deptId != null and deptId !=''">
+        AND e.dept_id = #{deptId}
+    </if>
+    </where>
+  </select>
+  <select id="selectEmplRoleById" resultType="cn.wolfcode.domain.Role">
+    select * from role
+    where id in(
+    select role_id
+    from employee_role
+    where employee_id=#{id}
+    )
+  </select>
+    <select id="selectByUsername" resultType="cn.wolfcode.domain.Employee">
+      select *
+      from employee
+      where username=#{username}
+    </select>
+  <select id="selectByUsernameAndPassword" resultType="cn.wolfcode.domain.Employee">
+    select *
+    from employee
+    where username=#{username} and password=#{password}
+  </select>
+
+  <sql id="sql_one">
+    <where>
+      <if test="keyword != null and keyword !=''">
+          AND (e.name LIKE concat('%',#{keyword},'%') OR e.email LIKE concat('%',#{keyword},'%'))
+      </if>        
+      <if test="deptId != null and deptId !=''">
+        AND e.dept_id = #{deptId}        
+      </if>
+    </where>
+  </sql>
+
+
+</mapper>

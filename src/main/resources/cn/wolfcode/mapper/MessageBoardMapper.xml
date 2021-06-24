@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.wolfcode.mapper.MessageBoardMapper" >
+  <resultMap id="BaseResultMap" type="cn.wolfcode.domain.MessageBoard" >
+    <id column="id" property="id" />
+    <result column="nickname" property="nickname" />
+    <result column="content" property="content" />
+    <result column="create_time" property="createTime" />
+    <result column="category_id" property="systemDictionary.id" />
+    <result column="sd_name" property="systemDictionary.name" />
+    <result column="fatherName" property="fatherName" />
+    <result column="replyStatus" property="replyStatus" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" >
+    delete from message_board
+    where id = #{id}
+  </delete>
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id" >
+    insert into message_board (nickname, content, create_time, category_id,replyStatus)
+    values (#{nickname}, #{content}, #{createTime}, #{systemDictionary.id}, #{replyStatus})
+  </insert>
+  <update id="updateByPrimaryKey" >
+    update message_board
+    set replyStatus = #{replyStatus}
+    where id = #{id}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" >
+    select id, nickname, content, create_time, category_id, replyStatus
+    from message_board
+    where id = #{id}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select id, nickname, content, create_time, category_id, replyStatus
+    from message_board
+  </select>
+    <select id="selectForList" resultMap="BaseResultMap">
+      select mb.id, mb.nickname, mb.content, mb.create_time, mb.category_id, mb.replyStatus,
+            sd.id,sd.name as sd_name , fn.name as fatherName
+      from message_board mb
+      join system_dictionary sd on mb.category_id = sd.id
+      join system_dictionary fn on fn.id = sd.parent_id
+      <where>
+        <if test="id!=null and id !=''">
+          and mb.id = #{id}
+        </if>
+      </where>
+      ORDER BY mb.create_time DESC
+    </select>
+</mapper>

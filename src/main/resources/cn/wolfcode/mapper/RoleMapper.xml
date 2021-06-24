@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.wolfcode.mapper.RoleMapper" >
+  <resultMap id="BaseResultMap" type="cn.wolfcode.domain.Role" >
+    <id column="id" property="id" />
+    <result column="name" property="name" />
+    <result column="sn" property="sn" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" >
+    delete from role
+    where id = #{id}
+  </delete>
+  <delete id="deleteRolePermissionByRoleId">
+    delete from role_permission
+    where role_id=#{id}
+  </delete>
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id" >
+    insert into role (name, sn)
+    values (#{name}, #{sn})
+  </insert>
+  <insert id="insertRelation">
+    insert into role_permission( role_id, permission_id) values (#{roleId},#{permissionId})
+  </insert>
+
+  <update id="updateByPrimaryKey" >
+    update role
+    set name = #{name},
+      sn = #{sn}
+    where id = #{id}
+  </update>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" >
+    select id, name, sn
+    from role
+    where id = #{id}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select id, name, sn
+    from role
+  </select>
+  <select id="selectForList" resultType="cn.wolfcode.domain.Role">
+    select *
+    from role
+  </select>
+  <select id="selectRolePermissionById" resultType="cn.wolfcode.domain.Permission">
+    select *
+    from role_permission rp join permission p on (rp.permission_id=p.id)
+    where rp.role_id=#{roleId}
+  </select>
+</mapper>
